@@ -1,45 +1,54 @@
 import React from "react";
-import Header from "@/components/header";
 import FeaturesSection from "@/components/feature";
 import NewsletterSignup from "@/components/newslettersignup";
-import Footer from "@/components/productlistingfooter";
 import Image from "next/image";
+import Link from "next/link";
 const About = () => {
   return (
     <div>
-      <Header />
-      {/* Hero Section */}
       <div className="w-full h-auto flex flex-col md:flex-row justify-between items-center px-4 md:px-16 py-8">
         <div className="md:w-2/4 text-xl md:text-2xl text-center md:text-left text-custom-purple">
           A brand built on the love of craftsmanship, quality, and outstanding customer service
         </div>
         <div className="mt-6 md:mt-0">
+          <Link href="/productlisting">
           <button className="bg-gray-200 h-12 w-40 rounded-sm text-custom-purple">
             View our products
           </button>
+          </Link>
         </div>
       </div>
 
       {/* Story Section */}
-      <div className="flex flex-col md:flex-row w-full h-auto items-center justify-around px-4 py-16">
-        <div className="bg-[#2A254B] w-full md:w-2/5 text-white p-8 md:p-16 mb-8 md:mb-0">
-          <h1 className="text-xl md:text-2xl">It started with a small idea</h1>
-          <p className="mt-6">
-            A global brand with local beginnings, our story began in a small studio in South London in early 2014.
-          </p>
-          <button className="bg-input-bg h-12 w-40 rounded-sm mt-10 text-white">
-            View Collection
-          </button>
-        </div>
-        <div className="w-full md:w-2/5">
-          <Image
-            src="/images/about.png"
-            alt="About"
-            width={630}
-            height={478}
-            className="w-full transition-transform duration-300 ease-in-out hover:scale-105 hover:translate-y-1"
-          />
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 items-center h-auto md:h-[478px] mx-4 mb-4">
+      {/* Left Section */}
+      <div className="bg-[#2A254B] h-[400px] text-white flex flex-col justify-center p-6 md:pl-10  mt-[-80px]">
+        <h2 className="font-clash text-lg md:text-2xl leading-6 md:leading-8 mb-4">
+          It started with a small idea
+        </h2>
+        <p className="font-satoshi text-sm md:text-base leading-5 md:leading-6 mb-6">
+          A global brand with local beginnings, our story began in a small studio in South London in early 2014.
+        </p>
+        <Link
+          href="/productlisting"
+          className="bg-[#F9F9F926] text-white text-center font-medium text-sm md:text-base hover:bg-slate-400 hover:text-black
+          max-w-max py-3 px-6 rounded-lg transition-all duration-300"
+        >
+          View Collection
+        </Link>
+      </div>
+
+      {/* Right Section */}
+      <div className="relative h-full">
+        <Image
+          src="/images/about.png"
+          alt="chair"
+   
+          width={700}
+          height={600}
+          className="h-[400px]  object-cover"
+        />
+      </div>
       </div>
 
       {/* Service Section */}
@@ -65,7 +74,6 @@ const About = () => {
       </div>
       <FeaturesSection />
       <NewsletterSignup />
-      <Footer />
 </div>
   );
 }

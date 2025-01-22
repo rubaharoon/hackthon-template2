@@ -8,7 +8,7 @@ const Banner = () => {
   if (!visible) return null;
 
   return (
-    <div className="bg-[#2A254B] text-white px-4 py-2 flex justify-between items-center text-sm sm:text-base">
+    <div className="bg-[#2A254B] text-white px-2 py-2 flex justify-between items-center text-sm sm:text-base">
       {/* Centered Content */}
       <div className="flex items-center justify-center gap-2 mx-auto">
         <DeliveryTruck size={20} aria-label="Delivery icon" />

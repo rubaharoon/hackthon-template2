@@ -35,7 +35,7 @@ const features = [
 
 const FeaturesSection = () => {
   return (
-    <section className="py-12 bg-white">
+    <section className="py-8 bg-white">
       <div className="container mx-auto text-center">
         <h2 className="text-2xl font-bold mb-8 text-[#2A254B]">
           What makes our brand different

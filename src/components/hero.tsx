@@ -16,7 +16,7 @@ const Hero = () => {
                 </h1>
                 <div className="flex justify-center md:justify-start">
                   <Link href="/productlisting">
-                  <button className="w-[170px] h-[56px] bg-transparent text-white border border-gray-600 font-bold mt-12">
+                  <button className="w-[170px] h-[56px] bg-[#F9F9F9] bg-opacity-15 border border-gray-600 font-bold mt-12">
                     View collection
                   </button>
                   </Link>
@@ -34,7 +34,7 @@ const Hero = () => {
               </div>
             </div>
 
-            <div className="w-full md:w-[40%] h-auto md:h-[580px] bg-white flex justify-center items-end">
+            <div className="w-full md:w-[40%] h-auto md:h-[578px] bg-white flex justify-center items-end">
               <Image
                 src={"/images/chair.png"}
                 width={520}
