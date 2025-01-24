@@ -3,6 +3,7 @@ import FeaturesSection from "@/components/feature";
 import NewsletterSignup from "@/components/newslettersignup";
 import Image from "next/image";
 import Link from "next/link";
+
 const About = () => {
   return (
     <div>

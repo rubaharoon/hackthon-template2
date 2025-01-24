@@ -1,12 +1,21 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+// Define an interface for dimensions if it's an object
+interface Dimensions {
+  height?: string;
+  width?: string;
+  depth?: string;
+}
+
 interface CartItem {
   _id: string;
+  dimensions: Dimensions; // Assuming dimensions is an object with length, width, and height
   name: string;
   price: number;
   quantity: number;
   image: string;
-  description: string; 
+  description: string;
+  price_id: string;
 }
 
 interface CartState {
@@ -22,8 +31,8 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     addToCart: (state, action: PayloadAction<CartItem>) => {
-      const { _id, quantity } = action.payload;
-      const existingItem = state.items.find((item) => item._id === _id);
+      const { quantity } = action.payload;
+      const existingItem = state.items.find((item) => item._id === action.payload._id);
 
       if (existingItem) {
         existingItem.quantity += quantity;

@@ -4,6 +4,9 @@ import Link from "next/link";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/cart/store";
 import { toast } from "react-toastify";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { motion } from "framer-motion";
+
 
 interface IconsBarProps {
   language: string;
@@ -60,8 +63,20 @@ const Icons = ({ language, onLanguageChange }: IconsBarProps) => {
         </button>
       </Link>
 
-      {/* Login Link */}
-     
+     {/* Authentication Section */}
+     <SignedOut>
+              <SignInButton mode="modal">
+                <motion.button    className="text-sm font-medium flex items-center gap-2 bg-[#2A254B] text-white px-3 py-2 rounded-lg"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Login/Register
+                </motion.button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton showName />
+            </SignedIn>
 
       {/* Language Switcher */}
       <div className="flex items-center gap-2">

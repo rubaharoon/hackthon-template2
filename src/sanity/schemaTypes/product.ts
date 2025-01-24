@@ -79,5 +79,40 @@ export const product = defineType({
       ],
       description: "Dimensions of the product",
     }),
+    defineField({
+      name: "stock",
+      title: "Stock",
+      type: "number",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "inStock",
+      title: "In Stock",
+      type: "boolean",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "price_id",
+      title: "Stripe Price ID",
+      type: "string",
+    }),
   ],
+
+  preview: {
+    select: {
+      title: "name",
+      media: "image",
+      subtitle: "price",
+      inStock: "inStock",
+      stock: "stock",
+    },
+    prepare(selection) {
+      const { title, subtitle, media, inStock, stock } = selection;
+      return {
+        title,
+        subtitle: `${subtitle} | ${inStock ? `In Stock (${stock})` : "Out of Stock"}`,
+        media,
+      };
+    },
+  },
 });

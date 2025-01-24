@@ -5,7 +5,7 @@ import Image from "next/image";
 import { createClient } from "@sanity/client";
 import { useDispatch } from "react-redux";
 import imageUrlBuilder from "@sanity/image-url";
-import { SanityImageSource } from "@sanity/image-url/lib/types/types"; // Import the type
+import { SanityImageSource } from "@sanity/image-url/lib/types/types";
 import { addToCart } from "@/app/cart/features/cartSlice";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -18,9 +18,9 @@ import PopularProduct from "@/components/popularproduct";
 const client = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
-  apiVersion: "2025-01-20", // Use the current date
-  useCdn: false, // Ensure fresh data
-  token: process.env.SANITY_API_TOKEN, // Add the token for write operations
+  apiVersion: "2025-01-20",
+  useCdn: false,
+  token: process.env.SANITY_API_TOKEN,
 });
 
 // Image URL Builder
@@ -33,7 +33,7 @@ interface Dimensions {
   height?: string;
   width?: string;
   depth?: string;
-  length?: string; // Add the length property
+  length?: string;
 }
 
 interface Product {
@@ -41,7 +41,7 @@ interface Product {
   name: string;
   price: number;
   description: string;
-  image: SanityImageSource; // Updated type
+  image: SanityImageSource;
   features?: string[];
   dimensions?: Dimensions;
   quantity?: number;
@@ -134,13 +134,11 @@ const ProductDetail = () => {
         image: urlFor(productData.image).url(),
         description: productData.description,
         price_id: productData.price_id,
-        dimensions: productData.dimensions || { height: '', width: '', depth: '', length: '' }, // Add dimensions including length
+        dimensions: productData.dimensions || { height: '', width: '', depth: '', length: '' },
       };
 
-      // Dispatch to Redux
       dispatch(addToCart(cartItem));
 
-      // Save to localStorage
       const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
       const updatedCart = [...existingCart, cartItem];
       localStorage.setItem("cart", JSON.stringify(updatedCart));

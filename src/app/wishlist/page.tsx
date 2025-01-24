@@ -1,4 +1,3 @@
-// src/app/wishlist/page.tsx
 "use client";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/app/cart/store";
@@ -31,6 +30,8 @@ const WishlistPage = () => {
         quantity: 1, // Default quantity
         image: item.image,
         description: item.description,
+        dimensions: { height: "", width: "", depth: "" }, // Provide default dimensions
+        price_id: "", // Provide default price_id
       })
     );
 

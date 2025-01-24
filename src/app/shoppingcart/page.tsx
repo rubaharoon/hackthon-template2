@@ -10,7 +10,7 @@ const ShoppingCart = () => {
   const dispatch = useDispatch();
 
   // Get cart items from Redux store
-  const cartItems = useSelector((state: RootState) => state.cart.items);
+  const cartItems = useSelector((state: RootState) => state.cart.items.map(item => ({ ...item, _id: String(item._id) })));
   console.log(cartItems); // Debug: Check if description is present
 
   // Calculate subtotal
@@ -82,7 +82,7 @@ const ShoppingCart = () => {
                     </h1>
                     <div className="flex items-center gap-2 mt-2">
                       <button
-                        onClick={() => handleDecreaseQuantity(item._id)}
+                        onClick={() => item._id && handleDecreaseQuantity(item._id)}
                         className="text-[#CAC6DA] hover:text-[#2A254B]"
                         disabled={item.quantity === 1}
                       >
@@ -100,7 +100,7 @@ const ShoppingCart = () => {
                     </div>
                     {/* Remove Item Button */}
                     <button
-                      onClick={() => handleRemoveFromCart(item._id)}
+                      onClick={() => item._id && handleRemoveFromCart(item._id)}
                       className="text-sm text-red-500 hover:text-red-700 mt-2"
                     >
                       Remove

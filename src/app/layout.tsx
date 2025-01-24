@@ -7,6 +7,7 @@ import Footer from "@/components/footer";
 import Providers from "../app/providers";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { ClerkProvider } from "@clerk/nextjs";
 
 // Load custom fonts
 const geistSans = localFont({
@@ -26,18 +27,23 @@ const handleSearch = (query: string) => {
   // Implement search logic here
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
+    <ClerkProvider>
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         <Providers>
-         
-
           {/* Header with search functionality */}
           <Header onSearch={handleSearch} />
 
           {/* Main content */}
-          {children}
+         {children}
 
           {/* Toast notifications */}
           <ToastContainer
@@ -58,5 +64,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </Providers>
       </body>
     </html>
+    </ClerkProvider>
   );
 }

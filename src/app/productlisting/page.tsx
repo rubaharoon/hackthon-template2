@@ -10,6 +10,7 @@ import Pagination from "@/components/pagination";
 import CategoryFilterBar from "@/components/categoryfilterbar";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ProductComparison from "@/components/productcomparision"; // Import the ProductComparison component
 
 // Sanity client setup
 const client = createClient({
@@ -26,6 +27,7 @@ type Product = {
   imageUrl: string;
   price: number;
   features: string[];
+  brand: string;
   rating: number;
   tags: string[];
   inStock: boolean;
@@ -37,71 +39,49 @@ type Category = {
   name: string;
 };
 
-const ProductCard = ({ product, onSelect }: { product: Product; onSelect: (product: Product) => void }) => (
-  <Link href={`/productlisting/${product.slug.current}`} passHref>
-    <motion.div
-      className="border rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 cursor-pointer bg-white"
-      variants={{
-        hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0 },
-      }}
-      initial="hidden"
-      animate="visible"
-      exit="hidden"
-      transition={{ duration: 0.3 }}
-    >
-      <div
-        className="w-full h-64 overflow-hidden relative group"
-        onClick={(e) => {
-          e.preventDefault();
-          onSelect(product);
-        }}
-      >
+const ProductCard = ({
+  product,
+  onCompare,
+}: {
+  product: Product;
+  onCompare: (product: Product) => void;
+}) => (
+  <motion.div
+    className="border rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 cursor-pointer bg-white"
+    variants={{
+      hidden: { opacity: 0, y: 20 },
+      visible: { opacity: 1, y: 0 },
+    }}
+    initial="hidden"
+    animate="visible"
+    exit="hidden"
+    transition={{ duration: 0.3 }}
+  >
+    <Link href={`/productlisting/${product.slug.current}`} passHref>
+      <div className="w-full h-64 overflow-hidden relative group">
         <Image
           src={product.imageUrl || "/placeholder.png"}
           alt={product.name}
-          width={300}
-          height={300}
+          width={1000}
+          height={1000}
           className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
         />
       </div>
-      <div className="p-4">
-        <h3 className="font-medium text-lg text-gray-800">{product.name}</h3>
-        <p className="text-gray-600">£{product.price}</p>
-      </div>
-    </motion.div>
-  </Link>
-);
-
-const ComparisonPopup = ({ products, onClose }: { products: Product[]; onClose: () => void }) => (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-    <div className="bg-white rounded-lg p-6 w-full max-w-4xl">
-      <h2 className="text-2xl font-bold mb-4">Product Comparison</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        {products.map((product) => (
-          <div key={product._id} className="border p-4 rounded-lg">
-            <Image
-              src={product.imageUrl || "/placeholder.png"}
-              alt={product.name}
-              width={200}
-              height={200}
-              className="object-cover w-full h-48"
-            />
-            <h3 className="font-medium text-lg text-gray-800 mt-2">{product.name}</h3>
-            <p className="text-gray-600">Price: £{product.price}</p>
-            <p className="text-gray-600">Rating: {product.rating}/5</p>
-            <p className="text-gray-600">Features: {product.features.join(", ")}</p>
-          </div>
-        ))}
-      </div>
+    </Link>
+    <div className="p-4">
+      <h3 className="font-medium text-lg text-gray-800">{product.name}</h3>
+      <p className="text-gray-600">£{product.price}</p>
       <button
-        onClick={onClose}
-        className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+        onClick={(e) => {
+          e.preventDefault(); // Prevent link navigation
+          onCompare(product);
+        }}
+        className="mt-2 px-4 py-2 bg-[#2A254B] text-white rounded hover:bg-gray-600"
       >
-        Close
+        Add to Compare
       </button>
     </div>
-  </div>
+  </motion.div>
 );
 
 export default function ProductListing() {
@@ -109,14 +89,12 @@ export default function ProductListing() {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(8);
-  const [searchQuery, setSearchQuery] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [inStockOnly, setInStockOnly] = useState<boolean>(false);
   const [comparisonProducts, setComparisonProducts] = useState<Product[]>([]);
-  const [showComparisonPopup, setShowComparisonPopup] = useState<boolean>(false);
-  const [showViewButton, setShowViewButton] = useState<boolean>(false);
+  const [showComparison, setShowComparison] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -152,11 +130,6 @@ export default function ProductListing() {
 
   useEffect(() => {
     const filtered = products.filter((product) => {
-      const matchesSearch =
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.tags.some((tag) =>
-          tag.toLowerCase().includes(searchQuery.toLowerCase())
-        );
       const matchesCategory =
         selectedCategories.length === 0 ||
         selectedCategories.includes(product.category._id);
@@ -164,14 +137,12 @@ export default function ProductListing() {
         product.price >= priceRange[0] && product.price <= priceRange[1];
       const matchesAvailability = !inStockOnly || product.inStock;
 
-      return (
-        matchesSearch && matchesCategory && matchesPrice && matchesAvailability
-      );
+      return matchesCategory && matchesPrice && matchesAvailability;
     });
 
     setFilteredProducts(filtered);
     setCurrentPage(1);
-  }, [searchQuery, selectedCategories, priceRange, inStockOnly, products]);
+  }, [selectedCategories, priceRange, inStockOnly, products]);
 
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategories((prev) =>
@@ -186,37 +157,30 @@ export default function ProductListing() {
 
   const handleAvailabilityChange = () => setInStockOnly((prev) => !prev);
 
-  const handleProductSelect = (product: Product) => {
+  const handleProductCompare = (product: Product) => {
     if (comparisonProducts.some((p) => p._id === product._id)) {
       toast.warning("This product is already selected for comparison.");
       return;
     }
-    if (comparisonProducts.length >= 2) {
-      toast.error("You can compare only 2 products at a time.");
+    if (comparisonProducts.length >= 4) {
+      toast.error("You can compare only 4 products at a time.");
       return;
     }
     setComparisonProducts([...comparisonProducts, product]);
-
-    if (comparisonProducts.length === 0) {
-      toast.info("Add one more product to compare.");
-    } else if (comparisonProducts.length === 1) {
-      toast.success("Products compared successfully. Click 'View' to see details.");
-      setShowViewButton(true);
-    }
+    toast.success(`${product.name} added to comparison.`);
   };
 
   const handleCompareButtonClick = () => {
     if (comparisonProducts.length < 2) {
-      toast.error("Please add 2 products to compare.");
+      toast.error("Please select at least 2 products to compare.");
       return;
     }
-    setShowComparisonPopup(true);
+    setShowComparison(true);
   };
 
-  const handleCloseComparisonPopup = () => {
-    setShowComparisonPopup(false);
-    setShowViewButton(false); // Hide the "View" button when the popup is closed
-    setComparisonProducts([]); // Clear the comparison list
+  const handleCloseComparison = () => {
+    setShowComparison(false);
+    setComparisonProducts([]);
   };
 
   const indexOfLastProduct = currentPage * productsPerPage;
@@ -249,19 +213,8 @@ export default function ProductListing() {
 
       {/* Filter Bar */}
       <div className="container mx-auto mt-8 px-4">
-        <div className="flex flex-wrap items-center gap-4">
-          {/* Search Bar */}
-          <div className="flex-grow sm:flex-grow-0">
-            <input
-              type="text"
-              placeholder="Search by name or tags..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full sm:w-64 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Category Filter Dropdown */}
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          {/* Left Side: Category Filter */}
           <div className="flex-grow sm:flex-grow-0">
             <CategoryFilterBar
               categories={categories}
@@ -270,22 +223,7 @@ export default function ProductListing() {
             />
           </div>
 
-          {/* Other Filter Options */}
-          <div className="flex flex-wrap gap-4">
-            <div className="w-64">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Price Range
-              </label>
-              <Slider
-                min={0}
-                max={1000}
-                value={priceRange}
-                onChange={handlePriceChange}
-                range
-              />
-            </div>
-          </div>
-
+          {/* Center: In Stock Only Checkbox */}
           <div className="flex items-center space-x-2">
             <label className="text-sm font-medium text-gray-700">
               In Stock Only
@@ -297,6 +235,20 @@ export default function ProductListing() {
               className="form-checkbox h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
             />
           </div>
+
+          {/* Right Side: Price Range Slider */}
+          <div className="w-64">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Price Range
+            </label>
+            <Slider
+              min={0}
+              max={1000}
+              value={priceRange}
+              onChange={handlePriceChange}
+              range
+            />
+          </div>
         </div>
       </div>
 
@@ -305,7 +257,11 @@ export default function ProductListing() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           <AnimatePresence>
             {currentProducts.map((product) => (
-              <ProductCard key={product._id} product={product} onSelect={handleProductSelect} />
+              <ProductCard
+                key={product._id}
+                product={product}
+                onCompare={handleProductCompare}
+              />
             ))}
           </AnimatePresence>
         </div>
@@ -320,34 +276,32 @@ export default function ProductListing() {
         />
 
         {/* Compare Button */}
-        <div className="flex justify-center mt-8">
+        {comparisonProducts.length > 0 && (
+          <div className="flex justify-center w-full mt-8">
           <button
             onClick={handleCompareButtonClick}
-            className="px-4 py-2 bg-[#2A254B] text-white rounded hover:bg-gray-600"
+            className="px-4 py-2 bg-[#2A254B] text-white rounded hover:bg-gray-600 transition-colors duration-300"
           >
-            Compare Products
+            Compare Products ({comparisonProducts.length}/4)
           </button>
         </div>
-
-        {/* View Button */}
-        {showViewButton && (
-          <div className="flex justify-center mt-4">
-            <button
-              onClick={() => setShowComparisonPopup(true)}
-              className="px-4 py-2 bg-[#2A254B] text-white rounded hover:bg-gray-600"
-            >
-              View Comparison
-            </button>
-          </div>
         )}
       </div>
 
-      {/* Comparison Popup */}
-      {showComparisonPopup && (
-        <ComparisonPopup
-          products={comparisonProducts}
-          onClose={handleCloseComparisonPopup}
-        />
+      {/* Product Comparison Modal */}
+      {showComparison && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-6xl">
+            <h2 className="text-2xl font-bold mb-4">Product Comparison</h2>
+            <ProductComparison products={comparisonProducts} />
+            <button
+              onClick={handleCloseComparison}
+              className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            >
+              Close
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
