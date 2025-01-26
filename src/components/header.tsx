@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Menu, Close } from "@carbon/icons-react";
+import { Menu } from "@carbon/icons-react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SearchBar from "@/components/searchbar";
@@ -57,7 +57,7 @@ const Header = ({ onSearch }: HeaderProps) => {
           aria-label="Menu"
           onClick={() => setMenuOpen(!menuOpen)}
         >
-          {!menuOpen ? <Menu size={24} /> : <Close size={24} />}
+          {!menuOpen ? <Menu size={24} /> : null}
         </button>
 
         {/* Icons  (Desktop) */}

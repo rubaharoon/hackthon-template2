@@ -10,7 +10,7 @@ import Pagination from "@/components/pagination";
 import CategoryFilterBar from "@/components/categoryfilterbar";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import ProductComparison from "@/components/productcomparision"; // Import the ProductComparison component
+import ProductComparison from "@/components/productcomparision";
 
 // Sanity client setup
 const client = createClient({
@@ -73,7 +73,7 @@ const ProductCard = ({
       <p className="text-gray-600">£{product.price}</p>
       <button
         onClick={(e) => {
-          e.preventDefault(); // Prevent link navigation
+          e.preventDefault();
           onCompare(product);
         }}
         className="mt-2 px-4 py-2 bg-[#2A254B] text-white rounded hover:bg-gray-600"
@@ -99,27 +99,23 @@ export default function ProductListing() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const productsQuery = `*[_type == "product"]{
-          _id,
-          name,
-          slug,
-          "imageUrl": image.asset->url,
-          price,
-          features,
-          rating,
-          tags,
-          inStock,
-          category->{_id, name}
-        }`;
-        const productsData = await client.fetch(productsQuery);
+        const [productsData, categoriesData] = await Promise.all([
+          client.fetch(`*[_type == "product"]{
+            _id,
+            name,
+            slug,
+            "imageUrl": image.asset->url,
+            price,
+            features,
+            rating,
+            tags,
+            inStock,
+            category->{_id, name}
+          }`),
+          client.fetch(`*[_type == "category"]{ _id, name }`),
+        ]);
         setProducts(productsData);
         setFilteredProducts(productsData);
-
-        const categoriesQuery = `*[_type == "category"]{
-          _id,
-          name,
-        }`;
-        const categoriesData = await client.fetch(categoriesQuery);
         setCategories(categoriesData);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -278,13 +274,13 @@ export default function ProductListing() {
         {/* Compare Button */}
         {comparisonProducts.length > 0 && (
           <div className="flex justify-center w-full mt-8">
-          <button
-            onClick={handleCompareButtonClick}
-            className="px-4 py-2 bg-[#2A254B] text-white rounded hover:bg-gray-600 transition-colors duration-300"
-          >
-            Compare Products ({comparisonProducts.length}/4)
-          </button>
-        </div>
+            <button
+              onClick={handleCompareButtonClick}
+              className="px-4 py-2 bg-[#2A254B] text-white rounded hover:bg-gray-600 transition-colors duration-300"
+            >
+              Compare Products ({comparisonProducts.length}/4)
+            </button>
+          </div>
         )}
       </div>
 

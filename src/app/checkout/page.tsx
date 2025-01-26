@@ -8,6 +8,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import Banner from "@/components/banner";
 
 // Define the CartItem type
 type CartItem = {
@@ -112,7 +113,8 @@ export default function Checkout() {
       <div className="wrapper">
         <div className="py-8">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold text-[#1F2937] mb-8 text-center">
+            <Banner />
+            <h1 className="text-3xl font-bold text-[#1F2937] mb-8 text-center mt-12">
               Checkout
             </h1>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

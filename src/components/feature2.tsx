@@ -32,6 +32,8 @@ export default function FeatureSection() {
           width={720}
           height={603}
           className="rounded-md object-cover"
+          loading="lazy" // Lazy-load offscreen images
+          decoding="async" // Decode images asynchronously
         />
       </div>
     </section>

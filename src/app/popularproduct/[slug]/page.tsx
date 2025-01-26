@@ -1,4 +1,5 @@
 "use client";
+
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
@@ -10,9 +11,7 @@ import { addToCart } from "@/app/cart/features/cartSlice";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FavoriteFilled } from "@carbon/icons-react";
-import FeaturesSection from "@/components/feature";
 import NewsletterSignup from "@/components/newslettersignup";
-import PopularProduct from "@/components/popularproduct";
 
 // Initialize Sanity client
 const client = createClient({
@@ -50,7 +49,17 @@ interface Product {
   stock: number;
 }
 
-// Quantity Selector Component
+interface CartItem {
+  _id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+  description: string;
+  price_id: string;
+  dimensions: Dimensions;
+}
+
 const QuantitySelector = ({
   quantity,
   onIncrease,
@@ -83,7 +92,7 @@ const QuantitySelector = ({
   </div>
 );
 
-const ProductDetail = () => {
+const PopularProductDetail = () => {
   const { slug } = useParams();
   const [productData, setProduct] = useState<Product | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -104,7 +113,7 @@ const ProductDetail = () => {
 
     const fetchProduct = async () => {
       try {
-        const query = `*[_type == "product" && slug.current == $slug][0] {
+        const query = `*[_type == "product" && slug.current == $slug && "popular products" in tags][0] {
           _id,
           name,
           price,
@@ -166,7 +175,7 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     if (productData && productData.inStock && quantity <= productData.stock) {
-      const cartItem = {
+      const cartItem: CartItem = {
         _id: productData._id,
         name: productData.name,
         price: productData.price,
@@ -180,10 +189,12 @@ const ProductDetail = () => {
       dispatch(addToCart(cartItem));
 
       // Retrieve existing cart from localStorage
-      const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
+      const existingCart: CartItem[] = JSON.parse(localStorage.getItem("cart") || "[]");
 
       // Check if the item already exists in the cart
-      const existingItemIndex = existingCart.findIndex((item: Product) => item._id === cartItem._id);
+      const existingItemIndex = existingCart.findIndex(
+        (item: CartItem) => item._id === cartItem._id
+      );
 
       if (existingItemIndex >= 0) {
         // Update quantity if the item already exists
@@ -258,7 +269,21 @@ const ProductDetail = () => {
   }
 
   if (error) {
-    return <div className="text-center py-8 text-red-500">{error}</div>;
+    return (
+      <div className="text-center py-8 text-red-500">
+        {error}
+        <button
+          onClick={() => {
+            setError(null);
+            setLoading(true);
+            setProduct(null);
+          }}
+          className="bg-[#2A254B] text-white px-6 py-3 rounded-md hover:bg-[#3a345b] transition-colors duration-200 mt-4"
+        >
+          Retry
+        </button>
+      </div>
+    );
   }
 
   if (!productData) {
@@ -278,6 +303,8 @@ const ProductDetail = () => {
             height={1000}
             alt={productData.name}
             priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            quality={85}
           />
         </div>
 
@@ -380,8 +407,6 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      <PopularProduct />
-      <FeaturesSection />
       <NewsletterSignup />
       <ToastContainer
         position="bottom-right"
@@ -398,4 +423,4 @@ const ProductDetail = () => {
   );
 };
 
-export default ProductDetail;
+export default PopularProductDetail;

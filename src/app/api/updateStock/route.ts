@@ -1,12 +1,21 @@
 import { client } from "@/sanity/lib/client";
 import { NextResponse } from "next/server";
 
+// Error handling helper function
+const handleError = (error: unknown) => {
+  console.error("Error updating stock:", error);
+  return NextResponse.json(
+    { message: "Failed to update stock" },
+    { status: 500 }
+  );
+};
+
 export async function POST(request: Request) {
   try {
+    // Parse and validate request body
     const { productId, quantity } = await request.json();
 
-    // Validate input
-    if (!productId || typeof productId !== "string") {
+    if (!productId || typeof productId !== "string" || productId.trim() === "") {
       return NextResponse.json(
         { message: "Invalid product ID" },
         { status: 400 }
@@ -17,6 +26,15 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { message: "Invalid quantity" },
         { status: 400 }
+      );
+    }
+
+    // Validate Sanity client
+    if (!client) {
+      console.error("Sanity client is not configured.");
+      return NextResponse.json(
+        { message: "Internal Server Error: Sanity configuration issue" },
+        { status: 500 }
       );
     }
 
@@ -62,10 +80,13 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, newStock, inStock });
   } catch (error) {
-    console.error("Error updating stock:", error);
-    return NextResponse.json(
-      { message: error instanceof Error ? error.message : "Internal server error" },
-      { status: 500 }
-    );
+    if (error instanceof Error) {
+      console.error("Sanity API Error:", error.message);
+      return NextResponse.json(
+        { message: `Sanity API Error: ${error.message}` },
+        { status: 500 }
+      );
+    }
+    return handleError(error);
   }
 }

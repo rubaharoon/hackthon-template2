@@ -79,19 +79,19 @@ const Icons = ({ language, onLanguageChange }: IconsBarProps) => {
             </SignedIn>
 
       {/* Language Switcher */}
-      <div className="flex items-center gap-2">
-        <Globe size={20} className="text-gray-500" />
-        <select
-          value={language}
-          onChange={onLanguageChange}
-          className="text-gray-500 bg-transparent border-none focus:outline-none"
-          aria-label="Language Switcher"
-        >
-          <option value="en">English</option>
-          <option value="ur">Urdu</option>
-          <option value="fr">Français</option>
-        </select>
-      </div>
+      <div className="hidden lg:flex items-center gap-2">
+  <Globe size={20} className="text-gray-500" />
+  <select
+    value={language}
+    onChange={onLanguageChange}
+    className="text-gray-500 bg-transparent border-none focus:outline-none"
+    aria-label="Language Switcher"
+  >
+    <option value="en">English</option>
+    <option value="ur">Urdu</option>
+    <option value="fr">Français</option>
+  </select>
+</div>
     </div>
   );
 };

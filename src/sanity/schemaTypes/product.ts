@@ -96,8 +96,24 @@ export const product = defineType({
       title: "Stripe Price ID",
       type: "string",
     }),
-  ],
 
+    defineField({
+      name: "reviews",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          fields: [
+            defineField({ name: "name", type: "string" }),
+            defineField({ name: "rating", type: "number" }),
+            defineField({ name: "comment", type: "string" }),
+            defineField({ name: "date", type: "string" }),
+          ],
+          validation: (rule) => rule.required(),
+        },
+      ],
+    }),
+  ],
   preview: {
     select: {
       title: "name",

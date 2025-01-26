@@ -1,7 +1,7 @@
 "use client";
 
 import localFont from "next/font/local";
-import "./globals.css";
+import "./globals.css"; // Ensure this includes all necessary global styles
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import Providers from "../app/providers";
@@ -34,36 +34,45 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Providers>
-          {/* Header with search functionality */}
-          <Header onSearch={handleSearch} />
-
-          {/* Main content */}
-         {children}
-
-          {/* Toast notifications */}
-          <ToastContainer
-            position="bottom-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            aria-live="polite"
+      <html lang="en">
+        <head>
+          {/* Preloading critical resources */}
+          <link
+            rel="preload"
+            href="/_next/static/css/app/layout.css?v=1737914317507"
+            as="style"
           />
+         
+        </head>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <Providers>
+            {/* Header with search functionality */}
+            <Header onSearch={handleSearch} />
 
-          {/* Footer */}
-          <Footer />
-        </Providers>
-      </body>
-    </html>
+            {/* Main content */}
+            {children}
+
+            {/* Toast notifications */}
+            <ToastContainer
+              position="bottom-right"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              aria-live="polite"
+            />
+
+            {/* Footer */}
+            <Footer />
+          </Providers>
+        </body>
+      </html>
     </ClerkProvider>
   );
 }

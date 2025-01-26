@@ -9,16 +9,25 @@ interface PaginationProps {
   goToNextPage: () => void;
 }
 
-const Pagination = ({ currentPage, totalPages, paginate, goToPreviousPage, goToNextPage }: PaginationProps) => (
+const Pagination = ({
+  currentPage,
+  totalPages,
+  paginate,
+  goToPreviousPage,
+  goToNextPage,
+}: PaginationProps) => (
   <div className="flex justify-center items-center mt-8 space-x-2">
     <motion.button
       onClick={goToPreviousPage}
       disabled={currentPage === 1}
       className={`px-4 py-2 rounded-lg transition-colors duration-300 flex items-center ${
-        currentPage === 1 ? "bg-gray-200 text-gray-500 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-gray-100"
+        currentPage === 1
+          ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+          : "bg-white text-gray-700 hover:bg-gray-100"
       }`}
       whileHover={{ scale: currentPage === 1 ? 1 : 1.05 }}
       whileTap={{ scale: currentPage === 1 ? 1 : 0.95 }}
+      aria-label="Previous Page"
     >
       <ChevronLeft size={16} className="mr-2" />
       Previous
@@ -29,10 +38,13 @@ const Pagination = ({ currentPage, totalPages, paginate, goToPreviousPage, goToN
         key={index}
         onClick={() => paginate(index + 1)}
         className={`px-4 py-2 rounded-lg transition-colors duration-300 ${
-          currentPage === index + 1 ? "bg-[#2A254B] text-white" : "bg-white text-gray-700 hover:bg-gray-100"
+          currentPage === index + 1
+            ? "bg-[#2A254B] text-white"
+            : "bg-white text-gray-700 hover:bg-gray-100"
         }`}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
+        aria-label={`Go to Page ${index + 1}`}
       >
         {index + 1}
       </motion.button>
@@ -42,10 +54,13 @@ const Pagination = ({ currentPage, totalPages, paginate, goToPreviousPage, goToN
       onClick={goToNextPage}
       disabled={currentPage === totalPages}
       className={`px-4 py-2 rounded-lg transition-colors duration-300 flex items-center ${
-        currentPage === totalPages ? "bg-gray-200 text-gray-500 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-gray-100"
+        currentPage === totalPages
+          ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+          : "bg-white text-gray-700 hover:bg-gray-100"
       }`}
       whileHover={{ scale: currentPage === totalPages ? 1 : 1.05 }}
       whileTap={{ scale: currentPage === totalPages ? 1 : 0.95 }}
+      aria-label="Next Page"
     >
       Next
       <ChevronRight size={16} className="ml-2" />
