@@ -61,7 +61,7 @@ const SearchBar = ({ onSearch, searchPlaceholder }: SearchBarProps) => {
           placeholder={searchPlaceholder}
           value={searchQuery}
           onChange={handleSearch}
-          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#2A254B]"
+          className="w-48 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#2A254B]"
           aria-label="Search input"
         />
       </div>

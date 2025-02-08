@@ -1,31 +1,24 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
 import { Close as XIcon, Globe } from "@carbon/icons-react";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { motion } from "framer-motion";
 
 interface MobileMenuProps {
   translations: Record<string, string>;
   onClose: () => void;
+  language: string;
+  onLanguageChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
-const MobileMenu = ({ onClose }: MobileMenuProps) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(true);
-  const [language, setLanguage] = useState("en");
-
+const MobileMenu = ({ translations, onClose, language, onLanguageChange }: MobileMenuProps) => {
   const handleCloseMenu = () => {
-    setIsMenuOpen(false);
     onClose();
-  };
-
-  const onLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setLanguage(event.target.value);
   };
 
   return (
     <nav
-      className={`lg:hidden absolute top-[64px] left-0 w-full bg-[#FFFFFF] shadow-md text-[#726E8D] flex flex-col items-start p-4 transition-all duration-300 ${
-        isMenuOpen ? "transform translate-x-0" : "transform translate-x-full"
-      }`}
+      className="lg:hidden absolute top-[64px] left-0 w-full bg-[#FFFFFF] shadow-md text-[#726E8D] flex flex-col items-start p-4 transition-all duration-300 z-50"
     >
       {/* Close button */}
       <button
@@ -42,28 +35,28 @@ const MobileMenu = ({ onClose }: MobileMenuProps) => {
         className="py-2 hover:text-[#5a526c] w-full border-b border-gray-200"
         onClick={handleCloseMenu}
       >
-        Home
+        {translations["home"] || "Home"}
       </Link>
       <Link
         href="/about"
         className="py-2 hover:text-[#5a526c] w-full border-b border-gray-200"
         onClick={handleCloseMenu}
       >
-        About
+        {translations["about"] || "About"}
       </Link>
       <Link
         href="/contact"
         className="py-2 hover:text-[#5a526c] w-full border-b border-gray-200"
         onClick={handleCloseMenu}
       >
-        Contact
+        {translations["contact"] || "Contact"}
       </Link>
       <Link
         href="/productlisting"
         className="py-2 hover:text-[#5a526c] w-full border-b border-gray-200"
         onClick={handleCloseMenu}
       >
-        Products
+        {translations["products"] || "Products"}
       </Link>
 
       {/* Language Selector */}
@@ -79,6 +72,24 @@ const MobileMenu = ({ onClose }: MobileMenuProps) => {
           <option value="ur">Urdu</option>
           <option value="fr">Français</option>
         </select>
+      </div>
+
+      {/* Authentication */}
+      <div className="mt-4 w-full">
+        <SignedOut>
+          <SignInButton mode="modal">
+            <motion.button
+              className="text-sm font-medium flex items-center gap-2 bg-[#2A254B] text-white px-3 py-2 rounded-lg w-28"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Login/Register
+            </motion.button>
+          </SignInButton>
+        </SignedOut>
+        <SignedIn>
+          <UserButton showName />
+        </SignedIn>
       </div>
     </nav>
   );

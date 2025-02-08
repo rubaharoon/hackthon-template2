@@ -42,6 +42,7 @@ interface Dimensions {
 }
 
 interface ProductDetailType {
+  discount?: number | null;
   _id: string;
   name: string;
   price: number;
@@ -136,6 +137,7 @@ const ProductDetail = () => {
           _id,
           name,
           price,
+          discount,
           description,
           image,
           features,
@@ -200,50 +202,66 @@ const ProductDetail = () => {
       setQuantity((prev) => prev - 1);
     }
   };
-
-  const handleAddToCart = () => {
-    if (productData && productData.inStock && quantity <= productData.stock) {
-      const cartItem = {
-        _id: productData._id,
-        name: productData.name,
-        price: productData.price,
-        quantity: quantity,
-        image: urlFor(productData.image).url(),
-        description: productData.description,
-        price_id: productData.price_id,
-        dimensions: productData.dimensions || {
-          height: "",
-          width: "",
-          depth: "",
-          length: "",
-        },
-      };
-
-      dispatch(addToCart(cartItem));
-
-      const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
-      const updatedCart = [...existingCart, cartItem];
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
-
-      toast.success(`${productData.name} added to cart!`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-    } else {
-      toast.error("Not enough stock available.", {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+  useEffect(() => {
+    if (productData) {
+      const discountAmount = productData.discount
+        ? (productData.price * productData.discount) / 100
+        : 0;
+      setTotalPrice((productData.price - discountAmount) * quantity);
     }
-  };
+  }, [quantity, productData]);
+
+ const handleAddToCart = () => {
+  if (productData && productData.inStock && quantity <= productData.stock) {
+    const discountAmount = productData.discount
+      ? (productData.price * productData.discount) / 100
+      : 0;
+    const discountedPrice = productData.price - discountAmount;
+
+    const cartItem = {
+      _id: productData._id,
+      name: productData.name,
+      price: discountedPrice, // Store discounted price
+      originalPrice: productData.price, // Store original price for reference
+      quantity: quantity,
+      image: urlFor(productData.image).url(),
+      description: productData.description,
+      price_id: productData.price_id,
+      dimensions: productData.dimensions || {
+        height: "",
+        width: "",
+        depth: "",
+        length: "",
+      },
+    };
+
+    dispatch(addToCart(cartItem));
+
+    const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const updatedCart = [...existingCart, cartItem];
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+
+    toast.success(`${productData.name} added to cart!`, {
+      position: "bottom-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+  } else {
+    toast.error("Not enough stock available.", {
+      position: "bottom-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+  }
+};
+
+  
 
   if (loading) {
     return (
@@ -330,9 +348,23 @@ const ProductDetail = () => {
             {productData.name}
           </h1>
           <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-4">
-            <p className="text-lg sm:text-xl font-normal font-[Satoshi] text-[#12131A]">
+            <p className="text-lg sm:text-xl font-normal font-[Satoshi] text-red-600">
               £{totalPrice.toFixed(2)}
             </p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-4">
+              {productData.discount ? (
+                <>
+                  <p className="text-sm text-gray-500 line-through">
+                    £{(productData.price * quantity).toFixed(2)}
+                  </p>
+                </>
+              ) : (
+                <p className="text-lg sm:text-xl font-normal text-[#12131A]">
+                  £{totalPrice.toFixed(2)}
+                </p>
+              )}
+            </div>
+
             <p className="text-sm font-[Satoshi] text-[#505977]">
               {productData.inStock
                 ? `In Stock (${productData.stock} available)`
@@ -490,7 +522,9 @@ const ProductDetail = () => {
             {productData.reviews.map((review, index) => (
               <div key={index} className="mb-6">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-[#252B42]">{review.name}</span>
+                  <span className="font-bold text-[#252B42]">
+                    {review.name}
+                  </span>
                   <div className="flex text-[#F3CD03]">
                     {[...Array(5)].map((_, i) =>
                       i < review.rating ? (
@@ -509,7 +543,9 @@ const ProductDetail = () => {
             ))}
           </div>
         ) : (
-          <p className="text-[#737373]">No reviews yet. Be the first to review!</p>
+          <p className="text-[#737373]">
+            No reviews yet. Be the first to review!
+          </p>
         )}
       </div>
 

@@ -53,6 +53,7 @@ interface CartItem {
   _id: string;
   name: string;
   price: number;
+  originalPrice: number; 
   quantity: number;
   image: string;
   description: string;
@@ -179,6 +180,7 @@ const PopularProductDetail = () => {
         _id: productData._id,
         name: productData.name,
         price: productData.price,
+        originalPrice: productData.price, // Add this line
         quantity: quantity,
         image: urlFor(productData.image).url(),
         description: productData.description,

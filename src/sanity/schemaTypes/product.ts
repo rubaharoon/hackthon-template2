@@ -39,6 +39,14 @@ export const product = defineType({
       validation: (rule) => rule.required(),
       title: "Price",
     }),
+    // New discount field
+    defineField({
+      name: "discount",
+      title: "Discount Percentage",
+      type: "number",
+      description: "Discount percentage on this product (if any)",
+      validation: (rule) => rule.min(0).max(100),
+    }),
     defineField({
       name: "quantity",
       title: "Quantity",
@@ -96,7 +104,6 @@ export const product = defineType({
       title: "Stripe Price ID",
       type: "string",
     }),
-
     defineField({
       name: "reviews",
       type: "array",

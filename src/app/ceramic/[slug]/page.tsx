@@ -170,6 +170,7 @@ const ProductDetail = () => {
         _id: productData._id,
         name: productData.name,
         price: productData.price,
+        originalPrice: productData.price,
         quantity: quantity,
         image: urlFor(productData.image).url(),
         description: productData.description,

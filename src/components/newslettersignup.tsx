@@ -71,7 +71,7 @@ const NewsletterSignup = () => {
         </div>
         <button
           type="submit"
-          className="p-2 bg-[#2A254B] text-white w-full md:w-[118px] h-[56px] hover:bg-[#3a345b] transition-colors duration-200"
+          className="p-2 bg-[#2A254B] text-white w-48 md:w-[118px] h-[56px] hover:bg-[#3a345b] transition-colors duration-200"
         >
           Sign up
         </button>

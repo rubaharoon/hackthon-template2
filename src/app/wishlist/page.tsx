@@ -31,7 +31,8 @@ const WishlistPage = () => {
         image: item.image,
         description: item.description,
         dimensions: { height: "", width: "", depth: "" }, // Provide default dimensions
-        price_id: "", // Provide default price_id
+        price_id: "",
+        originalPrice: item.price
       })
     );
 

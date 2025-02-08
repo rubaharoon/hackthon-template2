@@ -9,6 +9,7 @@ interface Dimensions {
 
 // Define an interface for a cart item
 interface CartItem {
+  originalPrice: number;
   _id: string;
   dimensions: Dimensions;
   name: string;

@@ -17,7 +17,7 @@ const Hero = () => {
             display things digitally using modern web technologies.
           </p>
           <Link href="/productlisting">
-            <button className="w-full md:w-[188px] py-[16px] px-[32px] bg-[#f9f9f9] bg-opacity-[15%] leading-6 text-white font-satoshi font-normal hover:bg-lightGray hover:text-darkBlue transition-all duration-300 ease-in-out">
+            <button className="w-48 md:w-[188px] py-[16px] px-[32px] bg-[#f9f9f9] bg-opacity-[15%] leading-6 text-white font-satoshi font-normal hover:bg-lightGray hover:text-darkBlue transition-all duration-300 ease-in-out">
               View collection
             </button>
           </Link>

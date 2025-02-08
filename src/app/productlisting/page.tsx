@@ -8,9 +8,8 @@ import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import Pagination from "@/components/pagination";
 import CategoryFilterBar from "@/components/categoryfilterbar";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import ProductComparison from "@/components/productcomparision";
 
 // Sanity client setup
 const client = createClient({
@@ -26,6 +25,7 @@ type Product = {
   slug: { current: string };
   imageUrl: string;
   price: number;
+  discount?: number; // discount fetched from Sanity
   features: string[];
   brand: string;
   rating: number;
@@ -38,51 +38,54 @@ type Category = {
   _id: string;
   name: string;
 };
+const ProductCard = ({ product }: { product: Product }) => {
+  const discount = product.discount; // Discount percentage (if available)
+  const finalPrice = discount
+    ? product.price - product.price * (discount / 100)
+    : product.price;
 
-const ProductCard = ({
-  product,
-  onCompare,
-}: {
-  product: Product;
-  onCompare: (product: Product) => void;
-}) => (
-  <motion.div
-    className="border rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 cursor-pointer bg-white"
-    variants={{
-      hidden: { opacity: 0, y: 20 },
-      visible: { opacity: 1, y: 0 },
-    }}
-    initial="hidden"
-    animate="visible"
-    exit="hidden"
-    transition={{ duration: 0.3 }}
-  >
-    <Link href={`/productlisting/${product.slug.current}`} passHref>
-      <div className="w-full h-64 overflow-hidden relative group">
-        <Image
-          src={product.imageUrl || "/placeholder.png"}
-          alt={product.name}
-          width={1000}
-          height={1000}
-          className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
-        />
+  return (
+    <motion.div className="relative border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300 bg-white">
+      {/* Display discount badge if discount exists */}
+      {discount && (
+        <motion.div
+          className="absolute top-2 left-2 bg-red-600 text-white px-3 py-1 text-sm font-bold rounded-lg shadow-lg animate-bounce"
+          initial={{ scale: 0.9 }}
+          animate={{ scale: 1 }}
+          transition={{ repeat: Infinity, repeatType: "reverse", duration: 1 }}
+        >
+          -{discount}% OFF
+        </motion.div>
+      )}
+      <Link href={`/productlisting/${product.slug.current}`} passHref>
+        <div className="w-full h-64 overflow-hidden relative group cursor-pointer">
+          <Image
+            src={product.imageUrl || "/placeholder.png"}
+            alt={product.name}
+            width={1000}
+            height={1000}
+            className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
+          />
+        </div>
+      </Link>
+      <div className="p-4">
+        <h3 className="font-medium text-lg text-gray-800">{product.name}</h3>
+        {discount ? (
+          <p className="text-gray-600">
+            <span className="line-through mr-2 text-gray-500">
+              £{product.price}
+            </span>
+            <span className="text-red-600 font-semibold text-xl">
+              £{finalPrice.toFixed(2)}
+            </span>
+          </p>
+        ) : (
+          <p className="text-gray-600 text-lg">£{product.price}</p>
+        )}
       </div>
-    </Link>
-    <div className="p-4">
-      <h3 className="font-medium text-lg text-gray-800">{product.name}</h3>
-      <p className="text-gray-600">£{product.price}</p>
-      <button
-        onClick={(e) => {
-          e.preventDefault();
-          onCompare(product);
-        }}
-        className="mt-2 px-4 py-2 bg-[#2A254B] text-white rounded hover:bg-gray-600"
-      >
-        Add to Compare
-      </button>
-    </div>
-  </motion.div>
-);
+    </motion.div>
+  );
+};
 
 export default function ProductListing() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -93,8 +96,6 @@ export default function ProductListing() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [inStockOnly, setInStockOnly] = useState<boolean>(false);
-  const [comparisonProducts, setComparisonProducts] = useState<Product[]>([]);
-  const [showComparison, setShowComparison] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -106,6 +107,7 @@ export default function ProductListing() {
             slug,
             "imageUrl": image.asset->url,
             price,
+            discount,
             features,
             rating,
             tags,
@@ -135,50 +137,11 @@ export default function ProductListing() {
 
       return matchesCategory && matchesPrice && matchesAvailability;
     });
-
     setFilteredProducts(filtered);
     setCurrentPage(1);
   }, [selectedCategories, priceRange, inStockOnly, products]);
 
-  const handleCategoryChange = (categoryId: string) => {
-    setSelectedCategories((prev) =>
-      prev.includes(categoryId)
-        ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId]
-    );
-  };
-
-  const handlePriceChange = (value: number | number[]) =>
-    setPriceRange(value as [number, number]);
-
-  const handleAvailabilityChange = () => setInStockOnly((prev) => !prev);
-
-  const handleProductCompare = (product: Product) => {
-    if (comparisonProducts.some((p) => p._id === product._id)) {
-      toast.warning("This product is already selected for comparison.");
-      return;
-    }
-    if (comparisonProducts.length >= 4) {
-      toast.error("You can compare only 4 products at a time.");
-      return;
-    }
-    setComparisonProducts([...comparisonProducts, product]);
-    toast.success(`${product.name} added to comparison.`);
-  };
-
-  const handleCompareButtonClick = () => {
-    if (comparisonProducts.length < 2) {
-      toast.error("Please select at least 2 products to compare.");
-      return;
-    }
-    setShowComparison(true);
-  };
-
-  const handleCloseComparison = () => {
-    setShowComparison(false);
-    setComparisonProducts([]);
-  };
-
+  // Pagination calculations
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = filteredProducts.slice(
@@ -187,15 +150,29 @@ export default function ProductListing() {
   );
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
+  // Pagination handlers
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
   const goToNextPage = () =>
     currentPage < totalPages && setCurrentPage(currentPage + 1);
   const goToPreviousPage = () =>
     currentPage > 1 && setCurrentPage(currentPage - 1);
 
+  // Filter handlers
+  const handleCategoryChange = (categoryId: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(categoryId)
+        ? prev.filter((id) => id !== categoryId)
+        : [...prev, categoryId]
+    );
+  };
+  const handlePriceChange = (value: number | number[]) =>
+    setPriceRange(value as [number, number]);
+  const handleAvailabilityChange = () => setInStockOnly((prev) => !prev);
+
   return (
     <div className="min-h-screen bg-gray-100">
       <ToastContainer position="bottom-right" autoClose={3000} />
+
       {/* Hero Section */}
       <div
         className="relative bg-cover bg-center h-64"
@@ -210,7 +187,7 @@ export default function ProductListing() {
       {/* Filter Bar */}
       <div className="container mx-auto mt-8 px-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          {/* Left Side: Category Filter */}
+          {/* Category Filter */}
           <div className="flex-grow sm:flex-grow-0">
             <CategoryFilterBar
               categories={categories}
@@ -219,7 +196,7 @@ export default function ProductListing() {
             />
           </div>
 
-          {/* Center: In Stock Only Checkbox */}
+          {/* In Stock Only */}
           <div className="flex items-center space-x-2">
             <label className="text-sm font-medium text-gray-700">
               In Stock Only
@@ -232,7 +209,7 @@ export default function ProductListing() {
             />
           </div>
 
-          {/* Right Side: Price Range Slider */}
+          {/* Price Range Slider */}
           <div className="w-64">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Price Range
@@ -253,11 +230,7 @@ export default function ProductListing() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           <AnimatePresence>
             {currentProducts.map((product) => (
-              <ProductCard
-                key={product._id}
-                product={product}
-                onCompare={handleProductCompare}
-              />
+              <ProductCard key={product._id} product={product} />
             ))}
           </AnimatePresence>
         </div>
@@ -270,35 +243,7 @@ export default function ProductListing() {
           goToPreviousPage={goToPreviousPage}
           goToNextPage={goToNextPage}
         />
-
-        {/* Compare Button */}
-        {comparisonProducts.length > 0 && (
-          <div className="flex justify-center w-full mt-8">
-            <button
-              onClick={handleCompareButtonClick}
-              className="px-4 py-2 bg-[#2A254B] text-white rounded hover:bg-gray-600 transition-colors duration-300"
-            >
-              Compare Products ({comparisonProducts.length}/4)
-            </button>
-          </div>
-        )}
       </div>
-
-      {/* Product Comparison Modal */}
-      {showComparison && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-6xl">
-            <h2 className="text-2xl font-bold mb-4">Product Comparison</h2>
-            <ProductComparison products={comparisonProducts} />
-            <button
-              onClick={handleCloseComparison}
-              className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

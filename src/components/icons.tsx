@@ -4,9 +4,7 @@ import Link from "next/link";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/cart/store";
 import { toast } from "react-toastify";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
-import { motion } from "framer-motion";
-
+import { SignedIn, UserButton } from "@clerk/nextjs";
 
 interface IconsBarProps {
   language: string;
@@ -63,35 +61,25 @@ const Icons = ({ language, onLanguageChange }: IconsBarProps) => {
         </button>
       </Link>
 
-     {/* Authentication Section */}
-     <SignedOut>
-              <SignInButton mode="modal">
-                <motion.button    className="text-sm font-medium flex items-center gap-2 bg-[#2A254B] text-white px-3 py-2 rounded-lg"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Login/Register
-                </motion.button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
-              <UserButton showName />
-            </SignedIn>
+      {/* Authentication Section */}
+      <SignedIn>
+        <UserButton showName />
+      </SignedIn>
 
-      {/* Language Switcher */}
+      {/* Language Switcher (Desktop) */}
       <div className="hidden lg:flex items-center gap-2">
-  <Globe size={20} className="text-gray-500" />
-  <select
-    value={language}
-    onChange={onLanguageChange}
-    className="text-gray-500 bg-transparent border-none focus:outline-none"
-    aria-label="Language Switcher"
-  >
-    <option value="en">English</option>
-    <option value="ur">Urdu</option>
-    <option value="fr">Français</option>
-  </select>
-</div>
+        <Globe size={20} className="text-gray-500" />
+        <select
+          value={language}
+          onChange={onLanguageChange}
+          className="text-gray-500 bg-transparent border-none focus:outline-none"
+          aria-label="Language Switcher"
+        >
+          <option value="en">English</option>
+          <option value="ur">Urdu</option>
+          <option value="fr">Français</option>
+        </select>
+      </div>
     </div>
   );
 };

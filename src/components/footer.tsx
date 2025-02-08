@@ -52,10 +52,18 @@ const Footer = () => {
               <li>
                 <Link href="/about">About us</Link>
               </li>
-              <li>Vacancies</li>
-              <li>Contact us</li>
-              <li>Privacy</li>
-              <li>Returns policy</li>
+              <li>
+                <Link href="/faq">FAQ</Link>
+              </li>
+              <li>
+                <Link href="/contact">Contact us</Link>
+              </li>
+              <li>
+                <Link href="/privacypolicy">Privacy Policy</Link>
+              </li>
+              <li>
+                <Link href="/returnpolicy">Return Policy</Link>
+              </li>
             </ul>
           </div>
 
