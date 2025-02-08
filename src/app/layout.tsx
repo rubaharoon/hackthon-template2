@@ -53,6 +53,7 @@ export default function RootLayout({
 
             {/* Main content */}
             {children}
+            <script src="//code.tidio.co/4ptzadmzkpcuccs9qfkhuyqvupdauu1r.js" async></script>
 
             {/* Toast notifications */}
             <ToastContainer
